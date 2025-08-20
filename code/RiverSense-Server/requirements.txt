@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+celery[redis]
+sqlalchemy
+psycopg2-binary
+georinex
+pandas
+scipy
+matplotlib
+celery
+redis

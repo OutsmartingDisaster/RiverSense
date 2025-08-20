@@ -1,0 +1,619 @@
+{
+  "__inputs": [],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "8.3.3"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "datasource",
+      "id": "postgres",
+      "name": "PostgreSQL",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "geomap",
+      "name": "Geomap",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 2,
+  "links": [],
+  "panels": [
+    {
+      "title": "Device Battery",
+      "type": "stat",
+      "datasource": {
+        "type": "postgres",
+        "uid": "P92386A4757E415B4"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "id": 7,
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^battery_level$/",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "pluginVersion": "8.3.3",
+      "targets": [
+        {
+          "refId": "A",
+          "format": "time_series",
+          "table": "measurements",
+          "timeColumn": "timestamp",
+          "metricColumn": "none",
+          "group": [],
+          "where": [
+            {
+              "type": "macro",
+              "name": "$__timeFilter",
+              "params": []
+            }
+          ],
+          "select": [
+            [
+              {
+                "type": "column",
+                "params": [
+                  "battery_level"
+                ]
+              }
+            ]
+          ],
+          "rawQuery": false
+        }
+      ],
+      "alert": {
+        "name": "Low device battery",
+        "for": "5m",
+        "frequency": "1m",
+        "noDataState": "ok",
+        "executionErrorState": "alerting",
+        "conditions": [
+          {
+            "type": "query",
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "type": "last",
+              "params": []
+            },
+            "evaluator": {
+              "type": "lt",
+              "params": [
+                20
+              ]
+            },
+            "operator": {
+              "type": "and"
+            }
+          }
+        ],
+        "notifications": []
+      }
+    },
+    {
+      "title": "Last Data Received",
+      "type": "stat",
+      "datasource": {
+        "type": "postgres",
+        "uid": "P92386A4757E415B4"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Time$/",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "pluginVersion": "8.3.3",
+      "targets": [
+        {
+          "refId": "A",
+          "format": "time_series",
+          "table": "measurements",
+          "timeColumn": "timestamp",
+          "metricColumn": "none",
+          "group": [],
+          "where": [
+            {
+              "type": "macro",
+              "name": "$__timeFilter",
+              "params": []
+            }
+          ],
+          "select": [
+            [
+              {
+                "type": "column",
+                "params": [
+                  "station_id"
+                ]
+              }
+            ]
+          ],
+          "rawQuery": false
+        }
+      ],
+      "alert": {
+        "name": "Station not reporting",
+        "for": "10m",
+        "frequency": "1m",
+        "noDataState": "alerting",
+        "executionErrorState": "alerting",
+        "conditions": [
+          {
+            "type": "query",
+            "query": {
+              "params": [
+                "A",
+                "10m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "type": "count",
+              "params": []
+            },
+            "evaluator": {
+              "type": "lt",
+              "params": [
+                1
+              ]
+            },
+            "operator": {
+              "type": "and"
+            }
+          }
+        ],
+        "notifications": []
+      }
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "P92386A4757E415B4"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.3.3",
+      "targets": [
+        {
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": false,
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "reflector_height"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "measurements",
+          "timeColumn": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Reflector Height",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "P92386A4757E415B4"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "P92386A4757E415B4"
+          },
+          "format": "time_series",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": false,
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "reflector_height"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "measurements",
+          "timeColumn": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Reflector Height Over Time",
+      "type": "timeseries",
+      "alert": {
+        "alertRuleTags": {},
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                80
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "last"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "name": "Reflector height critical",
+        "noDataState": "ok",
+        "notifications": []
+      }
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "P92386A4757E415B4"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "id": 5,
+      "options": {
+        "basemap": {
+          "config": {
+            "attribution": "",
+            "url": ""
+          },
+          "name": "CartoDB Positron",
+          "type": "carto"
+        },
+        "controls": {
+          "mouseWheelZoom": true,
+          "showAttribution": true,
+          "showDebug": false,
+          "showScale": false,
+          "showZoom": true
+        },
+        "layers": [
+          {
+            "config": {
+              "showLegend": true,
+              "style": {
+                "color": {
+                  "field": "reflector_height",
+                  "fixed": "dark-green",
+                  "mode": "fixed"
+                },
+                "opacity": 0.8,
+                "rotation": {
+                  "fixed": 0,
+                  "max": 360,
+                  "min": 0,
+                  "mode": "fixed"
+                },
+                "size": {
+                  "field": "reflector_height",
+                  "fixed": 5,
+                  "max": 20,
+                  "min": 2,
+                  "mode": "fixed"
+                },
+                "symbol": {
+                  "fixed": "circle",
+                  "mode": "fixed"
+                },
+                "text": {
+                  "field": "station_name",
+                  "fixed": "Station",
+                  "mode": "field"
+                },
+                "textConfig": {
+                  "fontSize": 12,
+                  "offsetX": 0,
+                  "offsetY": 0,
+                  "textAlign": "center",
+                  "textBaseline": "middle"
+                }
+              }
+            },
+            "location": {
+              "latitude": "latitude",
+              "longitude": "longitude",
+              "mode": "coords"
+            },
+            "name": "Stations",
+            "type": "markers"
+          }
+        ],
+        "view": {
+          "id": "zero",
+          "lat": 40,
+          "lon": -100,
+          "zoom": 3
+        }
+      },
+      "pluginVersion": "8.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "P92386A4757E415B4"
+          },
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": false,
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "station_name"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "latitude"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "longitude"
+                ],
+                "type": "column"
+              },
+              {
+                "params": [
+                  "reflector_height"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "table": "stations",
+          "timeColumn": "timestamp",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Station Locations",
+      "type": "geomap"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 34,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Primary Monitoring",
+  "uid": "c433e3a6-415d-4383-9134-8f8a5a4a0e2f",
+  "version": 1
+}

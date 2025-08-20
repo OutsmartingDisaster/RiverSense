@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=riversense
+      - POSTGRES_USER=riversense
+      - POSTGRES_PASSWORD=riversense
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5400:5432"
+
+  redis:
+    image: redis:6.2-alpine
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: api
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+    ports:
+      - "8002:8000"
+    environment:
+      - DATABASE_URL=postgresql://riversense:riversense@db/riversense
+      - REDIS_URL=redis://redis:6379/0
+      - BEARER_TOKEN=riversense # This is for development only, override in production
+    depends_on:
+      - db
+      - redis
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: worker
+    command: celery -A worker.tasks worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres_data:
